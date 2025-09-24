@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useSite } from '../hooks/useSite';
 import { useNotification } from '../hooks/useNotification';
@@ -19,17 +18,27 @@ const ContactPage: React.FC = () => {
         e.preventDefault();
         setIsSubmitting(true);
         try {
-            const response = await fetch('/.netlify/functions/send-contact-email', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData),
-            });
+            // When in development mode (using vite dev server), the Netlify function isn't available.
+            // We'll mock the API call to avoid a 404 error and allow the UI to function.
+            // In a production build on Netlify, this will call the actual function.
+            // FIX: Replaced Vite-specific `import.meta.env.DEV` with `process.env.NODE_ENV === 'development'` for broader compatibility and to resolve TypeScript errors.
+            if (process.env.NODE_ENV === 'development') {
+                console.log('--- DEVELOPMENT MODE: Mocking contact form submission ---');
+                console.log('Form Data:', formData);
+                await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
+            } else {
+                const response = await fetch('/.netlify/functions/send-contact-email', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData),
+                });
 
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(errorText || 'An unknown error occurred while sending the message.');
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(errorText || 'An unknown error occurred while sending the message.');
+                }
             }
             
             addNotification('success', 'Message Sent!', 'Thank you for your message. We will get back to you soon.');
