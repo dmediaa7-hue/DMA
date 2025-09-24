@@ -37,7 +37,7 @@ const Header: React.FC = () => {
     ];
 
     return (
-        <header className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-md sticky top-0 z-50">
+        <header className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-md sticky top-0 z-50 transition-colors duration-300">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-20">
                     <Link to="/" className="flex items-center space-x-2">
@@ -95,7 +95,7 @@ const Header: React.FC = () => {
                 </div>
             </div>
              {/* Mobile Menu */}
-             <div className={`${isMenuOpen ? 'block' : 'hidden'} md:hidden bg-white dark:bg-gray-800 absolute w-full shadow-lg animate-fade-in`}>
+             <div className={`${isMenuOpen ? 'block' : 'hidden'} md:hidden bg-white dark:bg-gray-800 absolute w-full shadow-lg animate-fade-in transition-colors duration-300`}>
                 <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
                     {navLinks.map(link => (
                         <NavLink

@@ -33,7 +33,7 @@ const Toast: React.FC<{ notification: Notification; onDismiss: (id: number) => v
         setTimeout(() => onDismiss(notification.id), 300);
     };
 
-    const baseClasses = "w-full max-w-sm bg-white dark:bg-dark-card shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden";
+    const baseClasses = "w-full max-w-sm bg-white dark:bg-dark-card shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden transition-colors duration-300";
     const animationClasses = isExiting ? 'animate-fade-out-right' : 'animate-fade-in-right';
 
     const typeClasses = {
