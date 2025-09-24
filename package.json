@@ -1,0 +1,10 @@
+{
+  "name": "digital-media-association-website",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "@supabase/supabase-js": "^2.44.4",
+    "netlify-plugin-bundle-env": "0.2.2",
+    "resend": "^3.5.0"
+  }
+}
