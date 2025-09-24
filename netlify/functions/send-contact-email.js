@@ -1,5 +1,5 @@
-const { Resend } = require('resend');
-const { createClient } = require('@supabase/supabase-js');
+import { Resend } from 'resend';
+import { createClient } from '@supabase/supabase-js';
 
 // This serverless function sends an email using the Resend SDK.
 // It dynamically fetches the site's contact email from Supabase.
@@ -8,7 +8,7 @@ const { createClient } = require('@supabase/supabase-js');
 // 2. SUPABASE_URL: Your project's Supabase URL (e.g., https://xyz.supabase.co)
 // 3. SUPABASE_ANON_KEY: Your project's Supabase public 'anon' key.
 
-exports.handler = async function(event) {
+export const handler = async function(event) {
     // Only allow POST requests
     if (event.httpMethod !== 'POST') {
         return { statusCode: 405, body: 'Method Not Allowed' };
