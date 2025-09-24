@@ -12,9 +12,9 @@ export const INITIAL_CONTENT: PageContent = {
         contentHtml: '<p>Founded in 2010, the Digital Media Association (DMA) has been at the forefront of the digital revolution. We are a non-profit organization committed to fostering a vibrant community of professionals, educators, and students in the ever-evolving world of digital media.</p><p>Our members represent a diverse range of disciplines, including web design, digital marketing, content creation, virtual reality, and interactive technology. We provide a platform for knowledge sharing, professional development, and networking to help our members excel in their careers.</p>',
         imageUrl: 'https://picsum.photos/800/600',
         features: [
-            { title: 'Our Mission', description: '<p>To empower digital media professionals with the resources, knowledge, and connections they need to succeed and innovate.</p>', icon: 'mission' },
-            { title: 'Our Vision', description: '<p>To be the global leader in shaping the future of digital media, setting standards for excellence and ethical practice.</p>', icon: 'vision' },
-            { title: 'Our Values', description: '<p>We believe in collaboration, continuous learning, integrity, and pushing the boundaries of creativity and technology.</p>', icon: 'values' }
+            { title: 'Our Mission', description: '<p>To empower digital media professionals with the resources, knowledge, and connections they need to succeed and innovate.</p>', icon: 'mission', imageUrl: 'https://picsum.photos/400/300?random=10' },
+            { title: 'Our Vision', description: '<p>To be the global leader in shaping the future of digital media, setting standards for excellence and ethical practice.</p>', icon: 'vision', imageUrl: 'https://picsum.photos/400/300?random=11' },
+            { title: 'Our Values', description: '<p>We believe in collaboration, continuous learning, integrity, and pushing the boundaries of creativity and technology.</p>', icon: 'values', imageUrl: 'https://picsum.photos/400/300?random=12' }
         ]
     },
     services: {

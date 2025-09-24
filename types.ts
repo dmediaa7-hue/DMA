@@ -37,7 +37,7 @@ export interface PageContent {
         subtitle?: string;
         contentHtml: string;
         imageUrl?: string;
-        features?: { title: string; description: string; icon: string }[];
+        features?: { title: string; description: string; icon: string; imageUrl?: string }[];
     };
 }
 

@@ -61,7 +61,7 @@ const CandidatesView: React.FC = () => {
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {candidates.map(candidate => (
                     <div key={candidate.id} className="bg-white dark:bg-dark-card rounded-lg shadow-md p-4 flex flex-col items-center">
-                        <img src={candidate.photoUrl} alt={candidate.name} className="w-24 h-24 rounded-full mb-4 border-4 border-primary/30" />
+                        <img src={candidate.photoUrl} alt={candidate.name} className="w-24 h-24 rounded-full mb-4 border-4 border-primary/30 no-copy" />
                         <h3 className="text-xl font-semibold">{candidate.name}</h3>
                         <p className="text-gray-500 dark:text-gray-400">{candidate.position}</p>
                         <p className="text-2xl font-bold mt-2 text-primary">{candidate.votes.toLocaleString()} Votes</p>

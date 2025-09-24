@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { HashRouter, Route, Routes, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
@@ -29,6 +28,7 @@ import ContentView from './components/admin/ContentView';
 import SettingsView from './components/admin/SettingsView';
 import ReportsView from './components/admin/ReportsView';
 import AdminLogsView from './components/admin/AdminLogsView';
+import GalleryView from './components/admin/GalleryView';
 
 const LoadingSpinner: React.FC = () => (
     <div className="fixed inset-0 bg-light-bg dark:bg-dark-bg flex items-center justify-center z-50">
@@ -95,6 +95,7 @@ const AppContent = () => {
                             <Route path="dashboard" element={<DashboardView />} />
                             <Route path="members" element={<MembersView />} />
                             <Route path="candidates" element={<CandidatesView />} />
+                            <Route path="gallery" element={<GalleryView />} />
                             <Route path="analytics" element={<AnalyticsView />} />
                             <Route path="content" element={<ContentView />} />
                             <Route path="settings" element={<SettingsView />} />

@@ -25,6 +25,8 @@ interface SiteContextType {
     clearAllMembers: () => Promise<void>;
     regenerateMemberCredentials: (id: string) => Promise<Member | null>;
     bulkRegenerateMemberCredentials: () => Promise<Member[]>;
+    addGalleryImages: (images: { file: File; caption: string }[]) => Promise<void>;
+    deleteGalleryImage: (image: GalleryImage) => Promise<void>;
 }
 
 export const SiteContext = createContext<SiteContextType | undefined>(undefined);
@@ -134,6 +136,17 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return updatedMembers;
     };
 
+    const addGalleryImages = async (images: { file: File; caption: string }[]) => {
+        const uploadPromises = images.map(img => api.addGalleryImage(img.file, img.caption));
+        const newImages = await Promise.all(uploadPromises);
+        setGallery(prev => [...prev, ...newImages]);
+    };
+
+    const deleteGalleryImage = async (image: GalleryImage) => {
+        await api.deleteGalleryImage(image);
+        setGallery(prev => prev.filter(g => g.id !== image.id));
+    };
+
     const value = {
         loading,
         members,
@@ -156,6 +169,8 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
         clearAllMembers,
         regenerateMemberCredentials,
         bulkRegenerateMemberCredentials,
+        addGalleryImages,
+        deleteGalleryImage,
     };
 
     return <SiteContext.Provider value={value}>{children}</SiteContext.Provider>;

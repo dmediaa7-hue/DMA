@@ -95,6 +95,66 @@ const ContentEditor: React.FC<{ pageKey: keyof PageContent, addAdminLog: (action
             reader.readAsDataURL(file);
         }
     };
+    
+    const handleFeatureImageUpload = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        if (file.size > 1 * 1024 * 1024) { // 1MB limit
+            addNotification('error', 'Image Too Large', 'Please upload an image smaller than 1MB.');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const img = new Image();
+            img.src = event.target?.result as string;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const MAX_WIDTH = 400;
+                const MAX_HEIGHT = 300;
+                let width = img.width;
+                let height = img.height;
+
+                if (width > height) {
+                    if (width > MAX_WIDTH) {
+                        height *= MAX_WIDTH / width;
+                        width = MAX_WIDTH;
+                    }
+                } else {
+                    if (height > MAX_HEIGHT) {
+                        width *= MAX_HEIGHT / height;
+                        height = MAX_HEIGHT;
+                    }
+                }
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                if (!ctx) return;
+                ctx.drawImage(img, 0, 0, width, height);
+                
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.85); // 85% quality JPEG
+
+                setPageData(prev => {
+                    if (!prev.features) return prev;
+                    const newFeatures = [...prev.features];
+                    newFeatures[index] = { ...newFeatures[index], imageUrl: dataUrl };
+                    return { ...prev, features: newFeatures };
+                });
+            };
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const handleRemoveFeatureImage = (index: number) => {
+        setPageData(prev => {
+            if (!prev.features) return prev;
+            const newFeatures = [...prev.features];
+            const { imageUrl, ...rest } = newFeatures[index];
+            newFeatures[index] = rest;
+            return { ...prev, features: newFeatures };
+        });
+    };
 
 
     return (
@@ -116,7 +176,10 @@ const ContentEditor: React.FC<{ pageKey: keyof PageContent, addAdminLog: (action
                     <label className="block text-sm font-medium mb-1">Header Image</label>
                     <div className="flex items-center gap-4">
                         <img src={pageData.imageUrl} alt="preview" className="w-20 h-20 object-cover rounded-md bg-gray-200" />
-                        <input type="file" accept="image/*" onChange={handleImageUpload} className="text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"/>
+                        <div>
+                            <input type="file" accept="image/*" onChange={handleImageUpload} className="text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"/>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Max 5MB. Will be optimized.</p>
+                        </div>
                     </div>
                 </div>
             )}
@@ -124,15 +187,35 @@ const ContentEditor: React.FC<{ pageKey: keyof PageContent, addAdminLog: (action
             {pageData.features && pageData.features.length > 0 && (
                 <div>
                     <label className="block text-sm font-medium mb-1">Page Features</label>
-                    <div className="space-y-4 mt-2 p-4 border rounded-md bg-gray-50 dark:bg-gray-800/50">
+                    <div className="space-y-6 mt-2 p-4 border rounded-md bg-gray-50 dark:bg-gray-800/50">
                         {pageData.features.map((feature, index) => (
-                            <div key={index}>
-                                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400">{feature.title}</label>
-                                 <div className="mt-1">
-                                    <RichTextEditor
-                                        value={feature.description}
-                                        onChange={newHtml => handleFeatureChange(index, newHtml)}
-                                    />
+                            <div key={index} className="border-b dark:border-gray-700 pb-6 last:border-b-0 last:pb-0">
+                                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">{feature.title}</label>
+                                
+                                <div className="mt-2">
+                                    <label className="block text-xs font-semibold text-gray-500">Image</label>
+                                    <div className="flex items-center gap-4 mt-1">
+                                        <img src={feature.imageUrl || 'https://via.placeholder.com/400x300.png?text=No+Image'} alt="Feature preview" className="w-24 h-[72px] object-cover rounded-md bg-gray-200" />
+                                        <div>
+                                            <input type="file" accept="image/*" onChange={e => handleFeatureImageUpload(e, index)} className="text-sm file:mr-4 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"/>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Max 1MB. Recommended size: 400x300px.</p>
+                                            {feature.imageUrl && (
+                                                <button onClick={() => handleRemoveFeatureImage(index)} className="text-xs text-red-500 hover:underline mt-1">
+                                                    Remove Image
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                 <div className="mt-4">
+                                    <label className="block text-xs font-semibold text-gray-500">Description</label>
+                                    <div className="mt-1">
+                                      <RichTextEditor
+                                          value={feature.description}
+                                          onChange={newHtml => handleFeatureChange(index, newHtml)}
+                                      />
+                                    </div>
                                 </div>
                             </div>
                         ))}

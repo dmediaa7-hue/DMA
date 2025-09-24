@@ -61,7 +61,7 @@ const ProfilePage: React.FC = () => {
                         <div className="absolute -bottom-12 -left-8 w-40 h-40 bg-white/10 rounded-full"></div>
                         <div className="flex justify-between items-start">
                              <h3 className="text-xl font-bold">{settings.siteName}</h3>
-                             <img src={settings.logoUrl} alt="Logo" className="w-8 h-8 filter invert brightness-0" />
+                             <img src={settings.logoUrl} alt="Logo" className="w-8 h-8 filter invert brightness-0 no-copy" />
                         </div>
                         <div className="mt-8">
                             <p className="text-sm uppercase tracking-wider">Member</p>

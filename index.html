@@ -9,6 +9,14 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Merriweather:wght@400;700&family=Inconsolata:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      .no-copy {
+        pointer-events: none;
+        -webkit-user-select: none; /* Safari */
+        -ms-user-select: none; /* IE 10 and IE 11 */
+        user-select: none; /* Standard syntax */
+      }
+    </style>
     <script>
       tailwind.config = {
         theme: {
@@ -73,5 +81,13 @@
   <body class="bg-light-bg dark:bg-dark-bg text-gray-800 dark:text-gray-200 font-sans transition-colors duration-300">
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
+    <script>
+      // Prevent right-click context menu on all image elements
+      document.addEventListener('contextmenu', function(e) {
+        if (e.target.tagName === 'IMG') {
+          e.preventDefault();
+        }
+      }, false);
+    </script>
   </body>
 </html>

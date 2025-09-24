@@ -294,3 +294,55 @@ export const changePassword = async (userId: string, oldPass: string, newPass: s
         throw new Error(`Failed to update password: ${updateError.message}`);
     }
 };
+
+export const addGalleryImage = async (file: File, caption: string): Promise<GalleryImage> => {
+    const filePath = `public/${Date.now()}-${file.name}`;
+    
+    const { error: uploadError } = await supabase.storage.from('Gallery').upload(filePath, file);
+    if (uploadError) {
+        throw new Error(`Storage upload failed: ${uploadError.message}`);
+    }
+
+    const { data: publicUrlData } = supabase.storage.from('Gallery').getPublicUrl(filePath);
+    if (!publicUrlData) {
+        throw new Error('Failed to get public URL for the uploaded image.');
+    }
+
+    const newImage: Omit<GalleryImage, 'id'> & { id?: string } = {
+        id: generateId('gal'),
+        url: publicUrlData.publicUrl,
+        caption: caption || 'No caption',
+    };
+
+    const { data, error: insertError } = await supabase.from('gallery').insert(newImage).select().single();
+    if (insertError) {
+        // Attempt to clean up the orphaned storage object
+        await supabase.storage.from('Gallery').remove([filePath]);
+        throw new Error(`Database insert failed: ${insertError.message}`);
+    }
+
+    return data;
+};
+
+export const deleteGalleryImage = async (image: GalleryImage): Promise<void> => {
+    // Extract file path from URL. Example: https://<...>/storage/v1/object/public/Gallery/public/12345-image.png
+    // The path stored is `public/12345-image.png`
+    const urlParts = image.url.split('/Gallery/');
+    if (urlParts.length < 2) {
+        throw new Error('Invalid image URL format. Cannot determine file path for deletion.');
+    }
+    const filePath = urlParts[1];
+
+    // 1. Delete from storage
+    const { error: storageError } = await supabase.storage.from('Gallery').remove([filePath]);
+    if (storageError) {
+        // Log the error but proceed to delete from DB anyway to avoid orphaned records.
+        console.error(`Failed to delete from storage, but proceeding with DB deletion: ${storageError.message}`);
+    }
+
+    // 2. Delete from database
+    const { error: dbError } = await supabase.from('gallery').delete().eq('id', image.id);
+    if (dbError) {
+        throw new Error(`Database delete failed: ${dbError.message}`);
+    }
+};

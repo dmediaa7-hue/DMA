@@ -32,6 +32,10 @@ const SettingsView: React.FC = () => {
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
+            if (file.size > 1 * 1024 * 1024) { // 1MB limit
+                addNotification('error', 'Image Too Large', 'Please upload a logo smaller than 1MB.');
+                return;
+            }
             const reader = new FileReader();
             reader.onloadend = () => {
                 setLocalSettings(prev => ({ ...prev, logoUrl: reader.result as string }));
@@ -112,8 +116,11 @@ const SettingsView: React.FC = () => {
                      <div>
                         <label className="block font-medium">Logo</label>
                         <div className="flex items-center space-x-4 mt-1">
-                            <img src={localSettings.logoUrl} alt="logo" className="h-12 w-12 bg-gray-200 p-1 rounded-md" />
-                            <input type="file" accept="image/*" onChange={handleImageUpload} className="text-sm" />
+                            <img src={localSettings.logoUrl} alt="logo" className="h-12 w-12 bg-gray-200 p-1 rounded-md no-copy" />
+                            <div>
+                                <input type="file" accept="image/*" onChange={handleImageUpload} className="text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"/>
+                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Max file size: 1MB.</p>
+                            </div>
                         </div>
                     </div>
                      <div>

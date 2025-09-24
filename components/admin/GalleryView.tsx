@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { useSite } from '../hooks/useSite';
-import { GalleryImage } from '../types';
-import Modal from '../components/common/Modal';
-import { useAuth } from '../hooks/useAuth';
-import { useNotification } from '../hooks/useNotification';
+import { useSite } from '../../hooks/useSite';
+import { useNotification } from '../../hooks/useNotification';
+import { GalleryImage } from '../../types';
+import Modal from '../common/Modal';
 
 // Upload Modal Component
 interface UploadModalProps {
@@ -37,7 +36,6 @@ const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose, onUpload, ad
         }
     };
 
-
     const handleCaptionChange = (index: number, caption: string) => {
         setFilesToUpload(prev => {
             const updated = [...prev];
@@ -67,9 +65,9 @@ const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose, onUpload, ad
         <Modal isOpen={isOpen} onClose={handleClose} title="Upload New Images">
             <div className="space-y-4">
                 <div>
-                    <label htmlFor="gallery-page-image-upload" className="block w-full text-center p-6 border-2 border-dashed rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                    <label htmlFor="admin-gallery-image-upload" className="block w-full text-center p-6 border-2 border-dashed rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50">
                         <p>Click to select images</p>
-                        <input id="gallery-page-image-upload" type="file" multiple accept="image/*" className="hidden" onChange={handleFileChange} />
+                        <input id="admin-gallery-image-upload" type="file" multiple accept="image/*" className="hidden" onChange={handleFileChange} />
                     </label>
                     <p className="text-xs text-center text-gray-500 dark:text-gray-400 mt-2">Max file size: 5MB per image.</p>
                 </div>
@@ -107,21 +105,13 @@ const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose, onUpload, ad
     );
 };
 
-const GalleryPage: React.FC = () => {
-    const { gallery, content, addGalleryImages, deleteGalleryImage, addAdminLog } = useSite();
-    const { isAdmin } = useAuth();
+
+const GalleryView: React.FC = () => {
+    const { gallery, addGalleryImages, deleteGalleryImage, addAdminLog } = useSite();
     const { addNotification } = useNotification();
+
     const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
-    const [isViewModalOpen, setIsViewModalOpen] = useState(false);
-    const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
     
-    const pageContent = content.gallery;
-
-    const openImage = (image: GalleryImage) => {
-        setSelectedImage(image);
-        setIsViewModalOpen(true);
-    };
-
     const handleDelete = async (image: GalleryImage) => {
         if (window.confirm(`Are you sure you want to delete the image "${image.caption}"? This is irreversible.`)) {
             try {
@@ -145,74 +135,51 @@ const GalleryPage: React.FC = () => {
     }
 
     return (
-        <div className="animate-fade-in container mx-auto px-4 py-16">
-            <header className="text-center mb-12">
-                <h1 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-500">{pageContent.title}</h1>
-                <p className="text-lg text-gray-600 dark:text-gray-400 mt-4">{pageContent.subtitle}</p>
-                {isAdmin && (
-                    <div className="mt-6">
-                        <button 
-                            onClick={() => setIsUploadModalOpen(true)}
-                            className="px-6 py-2 bg-primary text-white font-semibold rounded-lg shadow-md hover:bg-primary-dark transition-colors"
-                        >
-                            Add Images
-                        </button>
-                    </div>
-                )}
-            </header>
+        <div className="animate-fade-in">
+            <div className="flex justify-between items-center mb-6">
+                <h1 className="text-3xl font-bold text-gray-800 dark:text-white">Manage Gallery</h1>
+                <button 
+                    onClick={() => setIsUploadModalOpen(true)}
+                    className="px-6 py-2 bg-primary text-white font-semibold rounded-lg shadow-md hover:bg-primary-dark transition-colors"
+                >
+                    Add Images
+                </button>
+            </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {gallery.map((image) => (
-                    <div key={image.id} className="group relative overflow-hidden rounded-lg shadow-lg">
+                     <div key={image.id} className="group relative overflow-hidden rounded-lg shadow-lg">
                         <div
-                            onClick={() => openImage(image)}
-                            className="w-full h-72 bg-cover bg-center transform group-hover:scale-110 transition-transform duration-500 cursor-pointer"
                             style={{ backgroundImage: `url(${image.url})` }}
+                            className="w-full h-72 bg-cover bg-center transform group-hover:scale-110 transition-transform duration-500"
                             role="img"
                             aria-label={image.caption}
                         />
-                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-60 transition-all duration-500 flex items-end pointer-events-none">
+                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-60 transition-all duration-500 flex items-end">
                             <div className="p-4 text-white transform translate-y-full group-hover:translate-y-0 transition-transform duration-500">
                                 <h3 className="font-semibold text-lg">{image.caption}</h3>
                             </div>
                         </div>
-                        {isAdmin && (
-                             <button
-                                onClick={(e) => { e.stopPropagation(); handleDelete(image); }}
-                                className="absolute top-2 right-2 z-10 p-2 bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                                title="Delete image"
-                                aria-label="Delete image"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-                            </button>
-                        )}
+                        <button
+                            onClick={(e) => { e.stopPropagation(); handleDelete(image); }}
+                            className="absolute top-2 right-2 z-10 p-2 bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                            title="Delete image"
+                            aria-label="Delete image"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                        </button>
                     </div>
                 ))}
             </div>
-
-            <Modal isOpen={isViewModalOpen} onClose={() => setIsViewModalOpen(false)} title={selectedImage?.caption || 'Image'}>
-                {selectedImage && (
-                    <div>
-                        <div
-                            style={{ backgroundImage: `url(${selectedImage.url})` }}
-                            className="w-full aspect-video bg-contain bg-no-repeat bg-center"
-                            role="img"
-                            aria-label={selectedImage.caption}
-                        />
-                    </div>
-                )}
-            </Modal>
             
-            {isAdmin && (
-                <UploadModal 
-                    isOpen={isUploadModalOpen}
-                    onClose={() => setIsUploadModalOpen(false)}
-                    onUpload={handleUpload}
-                    addNotification={addNotification}
-                />
-            )}
+            <UploadModal 
+                isOpen={isUploadModalOpen}
+                onClose={() => setIsUploadModalOpen(false)}
+                onUpload={handleUpload}
+                addNotification={addNotification}
+            />
         </div>
     );
 };
 
-export default GalleryPage;
+export default GalleryView;

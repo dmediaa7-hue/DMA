@@ -74,7 +74,7 @@ const ElectionPage: React.FC = () => {
                     {candidates.map(candidate => (
                         <Card key={candidate.id} className="text-center">
                             <div className="p-6">
-                                <img src={candidate.photoUrl} alt={candidate.name} className="w-32 h-32 rounded-full mx-auto mb-4 border-4 border-primary/20" />
+                                <img src={candidate.photoUrl} alt={candidate.name} className="w-32 h-32 rounded-full mx-auto mb-4 border-4 border-primary/20 no-copy" />
                                 <h3 className="text-2xl font-semibold">{candidate.name}</h3>
                                 <p className="text-primary font-medium">{candidate.position}</p>
                             </div>

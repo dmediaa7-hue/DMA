@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useSite } from '../hooks/useSite';
@@ -15,10 +14,12 @@ const HomePage: React.FC = () => {
         return firstP?.textContent || html.replace(/<[^>]+>/g, '').substring(0, 150) + '...';
     };
 
-    const iconMap: { [key: string]: React.ReactElement } = {
-        mission: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="21.17" y1="8" x2="12" y2="8"/><line x1="3.95" y1="6.06" x2="8.54" y2="14"/><line x1="10.88" y1="21.94" x2="15.46" y2="14"/></svg>,
-        vision: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>,
-        values: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 2 3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>,
+    // FIX: Removed explicit type annotation to allow TypeScript to correctly infer
+    // the props of the SVG elements, resolving an issue with React.cloneElement.
+    const iconMap = {
+        mission: <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="21.17" y1="8" x2="12" y2="8"/><line x1="3.95" y1="6.06" x2="8.54" y2="14"/><line x1="10.88" y1="21.94" x2="15.46" y2="14"/></svg>,
+        vision: <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>,
+        values: <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 2 3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>,
     };
 
     return (
@@ -38,7 +39,7 @@ const HomePage: React.FC = () => {
             </section>
 
             {/* About Section Preview */}
-            <section className="py-20 bg-gray-50 dark:bg-gray-800">
+            <section className="py-20">
                 <div className="container mx-auto px-4">
                     <div className="text-center mb-12">
                         <h2 className="text-3xl md:text-4xl font-bold text-gray-800 dark:text-white">Who We Are</h2>
@@ -46,18 +47,28 @@ const HomePage: React.FC = () => {
                     </div>
                     <div className="grid md:grid-cols-3 gap-8">
                         {about.features?.map((feature, index) => (
-                            <Card key={index}>
-                                <div className="p-8 text-center">
-                                    <div className="flex items-center justify-center h-16 w-16 rounded-full bg-primary/10 text-primary mx-auto mb-4">
-                                        {iconMap[feature.icon]}
-                                    </div>
-                                    <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
+                             <div key={index} className="bg-white dark:bg-dark-card rounded-lg shadow-lg hover:shadow-2xl transition-shadow duration-300 overflow-hidden flex flex-col">
+                                <div className="relative w-full aspect-[4/3] bg-gray-100 dark:bg-gray-800">
+                                    {feature.imageUrl ? (
+                                        <img
+                                            src={feature.imageUrl}
+                                            alt={feature.title}
+                                            className="w-full h-full object-cover no-copy"
+                                        />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center text-primary opacity-30">
+                                            {React.cloneElement(iconMap[feature.icon as keyof typeof iconMap], { width: 64, height: 64 })}
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="p-8 text-center flex-grow flex flex-col">
+                                    <h3 className="text-2xl font-semibold mb-2">{feature.title}</h3>
                                     <div
                                         className="text-gray-600 dark:text-gray-400 prose dark:prose-invert max-w-none [&>p]:my-0"
                                         dangerouslySetInnerHTML={{ __html: feature.description }}
                                     />
                                 </div>
-                            </Card>
+                            </div>
                         ))}
                     </div>
                 </div>
