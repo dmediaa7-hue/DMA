@@ -60,15 +60,15 @@ const Toast: React.FC<{ notification: Notification; onDismiss: (id: number) => v
         <div className={`${baseClasses} ${animationClasses}`}>
             <div className="p-4">
                 <div className="flex items-start">
-                    <div className={`flex-shrink-0 p-2 rounded-lg ${currentType.iconBg}`}>
-                        <span className={currentType.iconText}>{currentType.icon}</span>
+                    <div className={`flex-shrink-0 p-2 rounded-lg ${currentType.iconBg} transition-colors duration-300`}>
+                        <span className={`${currentType.iconText} transition-colors duration-300`}>{currentType.icon}</span>
                     </div>
                     <div className="ml-3 w-0 flex-1 pt-0.5">
-                        <p className="text-sm font-medium text-gray-900 dark:text-white">{notification.title}</p>
-                        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{notification.message}</p>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white transition-colors duration-300">{notification.title}</p>
+                        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400 transition-colors duration-300">{notification.message}</p>
                     </div>
                     <div className="ml-4 flex-shrink-0 flex">
-                        <button onClick={handleDismiss} className="inline-flex text-gray-400 rounded-md hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                        <button onClick={handleDismiss} className="inline-flex text-gray-400 rounded-md hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-300">
                             <span className="sr-only">Close</span>
                             <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
                         </button>

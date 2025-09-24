@@ -42,7 +42,7 @@ const Header: React.FC = () => {
                 <div className="flex items-center justify-between h-20">
                     <Link to="/" className="flex items-center space-x-2">
                         <img src={settings.logoUrl} alt="DMA Logo" className="h-8 w-8 text-primary" />
-                        <span className="text-xl font-bold text-gray-800 dark:text-white">{settings.siteName}</span>
+                        <span className="text-xl font-bold text-gray-800 dark:text-white transition-colors duration-300">{settings.siteName}</span>
                     </Link>
 
                     <nav className="hidden md:flex items-center space-x-6">
@@ -69,7 +69,7 @@ const Header: React.FC = () => {
                         </button>
                         {currentUser && !isAdmin ? (
                             <>
-                                <Link to="/profile" className="font-medium text-gray-600 dark:text-gray-300 hover:text-primary">Profile</Link>
+                                <Link to="/profile" className="font-medium text-gray-600 dark:text-gray-300 hover:text-primary transition-colors duration-300">Profile</Link>
                                 <button onClick={handleLogout} className="px-4 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-primary-dark transition-colors">
                                     Logout
                                 </button>
@@ -109,18 +109,18 @@ const Header: React.FC = () => {
                             {link.name}
                         </NavLink>
                     ))}
-                    <div className="border-t border-gray-200 dark:border-gray-700 pt-4 pb-3">
+                    <div className="border-t border-gray-200 dark:border-gray-700 pt-4 pb-3 transition-colors duration-300">
                         <div className="px-2 space-y-2">
                              <button
                                 onClick={toggleTheme}
-                                className="flex items-center justify-between w-full px-3 py-2 rounded-md text-base font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                className="flex items-center justify-between w-full px-3 py-2 rounded-md text-base font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-300"
                             >
                                <span>Toggle Theme</span>
                                {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
                             </button>
                              {currentUser && !isAdmin ? (
                                  <>
-                                    <Link to="/profile" onClick={() => setIsMenuOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Profile</Link>
+                                    <Link to="/profile" onClick={() => setIsMenuOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-300">Profile</Link>
                                     <button onClick={() => { handleLogout(); setIsMenuOpen(false); }} className="block w-full text-left px-4 py-2 text-base font-medium text-white bg-primary rounded-md hover:bg-primary-dark transition-colors">
                                         Logout
                                     </button>

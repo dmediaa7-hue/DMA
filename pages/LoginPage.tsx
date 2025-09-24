@@ -31,12 +31,12 @@ const LoginPage: React.FC = () => {
     };
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
-            <div className="w-full max-w-md p-8 space-y-8 bg-white dark:bg-dark-card rounded-xl shadow-lg animate-fade-in">
-                <h2 className="text-2xl font-bold text-center text-gray-800 dark:text-white">Member & Admin Login</h2>
+        <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+            <div className="w-full max-w-md p-8 space-y-8 bg-white dark:bg-dark-card rounded-xl shadow-lg animate-fade-in transition-colors duration-300">
+                <h2 className="text-2xl font-bold text-center text-gray-800 dark:text-white transition-colors duration-300">Member & Admin Login</h2>
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
-                        <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors duration-300">
                             Email or Username
                         </label>
                         <input
@@ -51,7 +51,7 @@ const LoginPage: React.FC = () => {
                         />
                     </div>
                     <div className="relative">
-                        <label htmlFor="password"  className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        <label htmlFor="password"  className="block text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors duration-300">
                             Password
                         </label>
                         <input

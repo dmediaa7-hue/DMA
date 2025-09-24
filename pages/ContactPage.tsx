@@ -43,28 +43,28 @@ const ContactPage: React.FC = () => {
 
     return (
         <div className="animate-fade-in">
-             <header className="bg-gray-100 dark:bg-gray-800 py-16">
+             <header className="bg-gray-100 dark:bg-gray-800 py-16 transition-colors duration-300">
                 <div className="container mx-auto px-4 text-center">
-                    <h1 className="text-4xl md:text-5xl font-bold text-gray-800 dark:text-white">{pageContent.title}</h1>
-                    <p className="text-lg text-gray-600 dark:text-gray-400 mt-4">{pageContent.subtitle}</p>
+                    <h1 className="text-4xl md:text-5xl font-bold text-gray-800 dark:text-white transition-colors duration-300">{pageContent.title}</h1>
+                    <p className="text-lg text-gray-600 dark:text-gray-400 mt-4 transition-colors duration-300">{pageContent.subtitle}</p>
                 </div>
             </header>
 
             <div className="container mx-auto px-4 py-16">
                 <div className="grid md:grid-cols-2 gap-12">
-                    <div className="bg-white dark:bg-dark-card p-8 rounded-lg shadow-lg">
+                    <div className="bg-white dark:bg-dark-card p-8 rounded-lg shadow-lg transition-colors duration-300">
                         <h2 className="text-2xl font-bold mb-6">Send us a Message</h2>
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div>
-                                <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Full Name</label>
+                                <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors duration-300">Full Name</label>
                                 <input type="text" name="name" id="name" required value={formData.name} onChange={handleChange} className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary transition-colors duration-300" />
                             </div>
                              <div>
-                                <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Email Address</label>
+                                <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors duration-300">Email Address</label>
                                 <input type="email" name="email" id="email" required value={formData.email} onChange={handleChange} className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary transition-colors duration-300" />
                             </div>
                              <div>
-                                <label htmlFor="message" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Message</label>
+                                <label htmlFor="message" className="block text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors duration-300">Message</label>
                                 <textarea name="message" id="message" rows={4} required value={formData.message} onChange={handleChange} className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary transition-colors duration-300"></textarea>
                             </div>
                             <div>
