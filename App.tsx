@@ -53,6 +53,19 @@ const ThemeManager: React.FC<{ children: React.ReactNode }> = ({ children }) => 
              root.style.setProperty('--font-family', settings.font.family);
         }
     }, [settings]);
+    
+    useEffect(() => {
+        let link = document.getElementById('favicon-link') as HTMLLinkElement | null;
+        if (!link) {
+            link = document.createElement('link');
+            link.id = 'favicon-link';
+            link.rel = 'icon';
+            document.head.appendChild(link);
+        }
+        if (settings.faviconUrl) {
+            link.href = settings.faviconUrl;
+        }
+    }, [settings.faviconUrl]);
 
     return <>{children}</>;
 };

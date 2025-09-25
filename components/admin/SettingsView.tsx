@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useSite } from '../../hooks/useSite';
 import { useNotification } from '../../hooks/useNotification';
@@ -11,6 +12,7 @@ const SettingsView: React.FC = () => {
     const [passwords, setPasswords] = useState({ current: '', new: '', confirm: '' });
     const [isSaving, setIsSaving] = useState(false);
     const [isChangingPassword, setIsChangingPassword] = useState(false);
+    const [newDistrict, setNewDistrict] = useState('');
 
     useEffect(() => {
         setLocalSettings(settings);
@@ -44,6 +46,21 @@ const SettingsView: React.FC = () => {
         }
     };
     
+    const handleFaviconUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            if (file.size > 100 * 1024) { // 100KB limit
+                addNotification('error', 'Image Too Large', 'Please upload a favicon smaller than 100KB.');
+                return;
+            }
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setLocalSettings(prev => ({ ...prev, faviconUrl: reader.result as string }));
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
     const handleColorChange = (colorName: keyof typeof localSettings.colors, value: string) => {
         setLocalSettings(prev => ({...prev, colors: {...prev.colors, [colorName]: value}}))
     };
@@ -96,6 +113,26 @@ const SettingsView: React.FC = () => {
         }
     };
 
+    const handleAddDistrict = () => {
+        const trimmedDistrict = newDistrict.trim();
+        if (trimmedDistrict && !localSettings.districts.find(d => d.toLowerCase() === trimmedDistrict.toLowerCase())) {
+            setLocalSettings(prev => ({
+                ...prev,
+                districts: [...prev.districts, trimmedDistrict].sort()
+            }));
+            setNewDistrict('');
+        } else if (trimmedDistrict) {
+            addNotification('info', 'Duplicate District', `The district "${trimmedDistrict}" already exists.`);
+        }
+    };
+    
+    const handleRemoveDistrict = (districtToRemove: string) => {
+        setLocalSettings(prev => ({
+            ...prev,
+            districts: prev.districts.filter(d => d !== districtToRemove)
+        }));
+    };
+
     return (
         <div className="animate-fade-in">
             <div className="flex justify-between items-center mb-6">
@@ -120,6 +157,16 @@ const SettingsView: React.FC = () => {
                             <div>
                                 <input type="file" accept="image/*" onChange={handleImageUpload} className="text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"/>
                                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Max file size: 1MB.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label className="block font-medium">Favicon</label>
+                        <div className="flex items-center space-x-4 mt-1">
+                            <img src={localSettings.faviconUrl} alt="favicon" className="h-12 w-12 bg-gray-200 p-1 rounded-md no-copy" />
+                            <div>
+                                <input type="file" accept="image/*" onChange={handleFaviconUpload} className="text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"/>
+                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Max 100KB. Recommended: .ico, .png, .svg (e.g., 32x32px).</p>
                             </div>
                         </div>
                     </div>
@@ -187,6 +234,39 @@ const SettingsView: React.FC = () => {
                                 <option value="Merriweather">Merriweather (Serif)</option>
                                 <option value="Inconsolata">Inconsolata (Monospace)</option>
                             </select>
+                        </div>
+                    </div>
+
+                    <div className="bg-white dark:bg-dark-card rounded-lg shadow-md p-6 space-y-6">
+                        <h2 className="text-xl font-bold border-b pb-2">Manage Gallery Districts</h2>
+                        <div>
+                            <label className="block font-medium">Add New District</label>
+                            <div className="flex gap-2 mt-1">
+                                <input 
+                                    type="text" 
+                                    value={newDistrict}
+                                    onChange={e => setNewDistrict(e.target.value)}
+                                    onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleAddDistrict(); } }}
+                                    className="flex-grow p-2 border rounded-md bg-gray-100 dark:bg-gray-700"
+                                    placeholder="e.g., Mumbai"
+                                />
+                                <button onClick={handleAddDistrict} type="button" className="px-4 py-2 bg-secondary text-white rounded-md hover:bg-green-600">Add</button>
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block font-medium">Current Districts ({localSettings.districts.length})</label>
+                            <div className="flex flex-wrap gap-2 mt-2 p-2 rounded-md bg-gray-50 dark:bg-gray-800/50 min-h-[4rem]">
+                                {localSettings.districts.length > 0 ? (
+                                    localSettings.districts.map(district => (
+                                        <span key={district} className="flex items-center gap-2 px-3 py-1 bg-primary text-white text-sm rounded-full animate-fade-in">
+                                            {district}
+                                            <button onClick={() => handleRemoveDistrict(district)} title={`Remove ${district}`} className="text-white hover:bg-primary-dark rounded-full w-5 h-5 flex items-center justify-center font-bold">&times;</button>
+                                        </span>
+                                    ))
+                                ) : (
+                                    <p className="text-sm text-gray-500 dark:text-gray-400 p-2">No districts configured.</p>
+                                )}
+                            </div>
                         </div>
                     </div>
 

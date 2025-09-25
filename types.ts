@@ -22,6 +22,7 @@ export interface GalleryImage {
     id: string;
     url: string;
     caption: string;
+    district: string;
 }
 
 export interface Announcement {
@@ -37,6 +38,7 @@ export interface PageContent {
         subtitle?: string;
         contentHtml: string;
         imageUrl?: string;
+        bannerUrl?: string;
         features?: { title: string; description: string; icon: string; imageUrl?: string }[];
     };
 }
@@ -44,6 +46,7 @@ export interface PageContent {
 export interface SiteSettings {
     siteName: string;
     logoUrl: string;
+    faviconUrl?: string;
     contact: {
         address: string;
         phone: string;
@@ -67,6 +70,7 @@ export interface SiteSettings {
     font: {
         family: string;
     };
+    districts: string[];
 }
 
 export interface AdminLog {

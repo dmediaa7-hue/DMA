@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useSite } from '../../hooks/useSite';
 import { useNotification } from '../../hooks/useNotification';
@@ -8,19 +9,20 @@ import Modal from '../common/Modal';
 interface UploadModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onUpload: (files: { file: File; caption: string }[]) => Promise<void>;
+    onUpload: (files: { file: File; caption: string; district: string }[]) => Promise<void>;
     addNotification: (type: 'success' | 'error' | 'info', title: string, message: string) => void;
 }
 
 const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose, onUpload, addNotification }) => {
-    const [filesToUpload, setFilesToUpload] = useState<{ file: File; preview: string; caption: string }[]>([]);
+    const { settings } = useSite();
+    const [filesToUpload, setFilesToUpload] = useState<{ file: File; preview: string; caption: string; district: string }[]>([]);
     const [isUploading, setIsUploading] = useState(false);
     const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
-            const acceptedFiles: { file: File; preview: string; caption: string }[] = [];
-            for (const file of Array.from(e.target.files)) {
+            const acceptedFiles: { file: File; preview: string; caption: string; district: string }[] = [];
+            for (const file of Array.from(e.target.files) as File[]) {
                 if (file.size > MAX_FILE_SIZE) {
                     addNotification('error', 'File Too Large', `${file.name} exceeds the 5MB size limit and was not added.`);
                 } else {
@@ -28,11 +30,12 @@ const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose, onUpload, ad
                         file,
                         preview: URL.createObjectURL(file),
                         caption: '',
+                        district: settings.districts[0] || '',
                     });
                 }
             }
             setFilesToUpload(prev => [...prev, ...acceptedFiles]);
-            e.target.value = ''; // Reset input
+            e.target.value = '';
         }
     };
 
@@ -44,13 +47,21 @@ const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose, onUpload, ad
         });
     };
 
+    const handleDistrictChange = (index: number, district: string) => {
+        setFilesToUpload(prev => {
+            const updated = [...prev];
+            updated[index].district = district;
+            return updated;
+        });
+    };
+
     const handleRemove = (index: number) => {
         setFilesToUpload(prev => prev.filter((_, i) => i !== index));
     };
 
     const handleUpload = async () => {
         setIsUploading(true);
-        await onUpload(filesToUpload.map(({ file, caption }) => ({ file, caption })));
+        await onUpload(filesToUpload);
         setIsUploading(false);
         setFilesToUpload([]);
         onClose();
@@ -76,7 +87,7 @@ const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose, onUpload, ad
                         {filesToUpload.map((item, index) => (
                             <div key={index} className="flex items-center gap-4 p-2 bg-gray-100 dark:bg-gray-700/50 rounded-lg">
                                 <img src={item.preview} alt="preview" className="w-16 h-16 object-cover rounded-md" />
-                                <div className="flex-grow">
+                                <div className="flex-grow space-y-2">
                                     <input
                                         type="text"
                                         placeholder="Enter caption..."
@@ -84,6 +95,13 @@ const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose, onUpload, ad
                                         onChange={e => handleCaptionChange(index, e.target.value)}
                                         className="w-full p-2 border rounded-md bg-white dark:bg-gray-700"
                                     />
+                                    <select
+                                        value={item.district}
+                                        onChange={e => handleDistrictChange(index, e.target.value)}
+                                        className="w-full p-2 border rounded-md bg-white dark:bg-gray-700 text-sm"
+                                    >
+                                        {settings.districts.map(d => <option key={d} value={d}>{d}</option>)}
+                                    </select>
                                 </div>
                                 <button onClick={() => handleRemove(index)} className="p-2 text-red-500 hover:text-red-700">&times;</button>
                             </div>
@@ -105,12 +123,65 @@ const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose, onUpload, ad
     );
 };
 
+const EditModal: React.FC<{ image: GalleryImage | null; onClose: () => void; onSave: (image: GalleryImage) => Promise<void> }> = ({ image, onClose, onSave }) => {
+    const { settings } = useSite();
+    const [editedImage, setEditedImage] = useState<GalleryImage | null>(image);
+    const [isSaving, setIsSaving] = useState(false);
+
+    React.useEffect(() => {
+        setEditedImage(image);
+    }, [image]);
+
+    if (!editedImage) return null;
+
+    const handleSave = async () => {
+        setIsSaving(true);
+        await onSave(editedImage);
+        setIsSaving(false);
+        onClose();
+    };
+    
+    return (
+        <Modal isOpen={!!image} onClose={onClose} title="Edit Image Details">
+            <div className="space-y-4">
+                <img src={editedImage.url} alt="preview" className="w-full h-48 object-contain rounded-md bg-gray-100 dark:bg-gray-700" />
+                 <div>
+                    <label className="block text-sm font-medium mb-1">Caption</label>
+                    <input
+                        type="text"
+                        value={editedImage.caption}
+                        onChange={e => setEditedImage({ ...editedImage, caption: e.target.value })}
+                        className="w-full p-2 border rounded-md bg-white dark:bg-gray-700"
+                    />
+                </div>
+                 <div>
+                    <label className="block text-sm font-medium mb-1">District</label>
+                    <select
+                        value={editedImage.district}
+                        onChange={e => setEditedImage({ ...editedImage, district: e.target.value })}
+                        className="w-full p-2 border rounded-md bg-white dark:bg-gray-700"
+                    >
+                        {settings.districts.map(d => <option key={d} value={d}>{d}</option>)}
+                    </select>
+                </div>
+                <div className="flex justify-end space-x-2 pt-4">
+                    <button onClick={onClose} className="px-4 py-2 bg-gray-200 dark:bg-gray-600 rounded-md" disabled={isSaving}>Cancel</button>
+                    <button onClick={handleSave} className="px-4 py-2 bg-primary text-white rounded-md disabled:opacity-50" disabled={isSaving}>
+                        {isSaving ? 'Saving...' : 'Save Changes'}
+                    </button>
+                </div>
+            </div>
+        </Modal>
+    );
+};
+
 
 const GalleryView: React.FC = () => {
-    const { gallery, addGalleryImages, deleteGalleryImage, addAdminLog } = useSite();
+    const { gallery, addGalleryImages, updateGalleryImage, deleteGalleryImage, addAdminLog } = useSite();
     const { addNotification } = useNotification();
 
     const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+    const [editingImage, setEditingImage] = useState<GalleryImage | null>(null);
     
     const handleDelete = async (image: GalleryImage) => {
         if (window.confirm(`Are you sure you want to delete the image "${image.caption}"? This is irreversible.`)) {
@@ -124,7 +195,7 @@ const GalleryView: React.FC = () => {
         }
     };
     
-    const handleUpload = async (files: { file: File, caption: string }[]) => {
+    const handleUpload = async (files: { file: File, caption: string, district: string }[]) => {
         try {
             await addGalleryImages(files);
             await addAdminLog(`Uploaded ${files.length} new image(s) to the gallery.`);
@@ -133,6 +204,16 @@ const GalleryView: React.FC = () => {
             addNotification('error', 'Upload Failed', (error as Error).message);
         }
     }
+    
+    const handleSaveEdit = async (image: GalleryImage) => {
+        try {
+            await updateGalleryImage(image);
+            await addAdminLog(`Updated gallery image: ${image.caption}`);
+            addNotification('success', 'Image Updated', 'The image details have been saved.');
+        } catch (error) {
+            addNotification('error', 'Update Failed', (error as Error).message);
+        }
+    };
 
     return (
         <div className="animate-fade-in">
@@ -148,26 +229,23 @@ const GalleryView: React.FC = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {gallery.map((image) => (
-                     <div key={image.id} className="group relative overflow-hidden rounded-lg shadow-lg">
+                     <div key={image.id} className="group rounded-lg shadow-lg bg-white dark:bg-dark-card flex flex-col">
                         <div
                             style={{ backgroundImage: `url(${image.url})` }}
-                            className="w-full h-72 bg-cover bg-center transform group-hover:scale-110 transition-transform duration-500"
+                            className="w-full h-56 bg-cover bg-center rounded-t-lg"
                             role="img"
                             aria-label={image.caption}
                         />
-                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-60 transition-all duration-500 flex items-end">
-                            <div className="p-4 text-white transform translate-y-full group-hover:translate-y-0 transition-transform duration-500">
-                                <h3 className="font-semibold text-lg">{image.caption}</h3>
+                        <div className="p-4 flex-grow flex flex-col justify-between">
+                            <div>
+                                <p className="font-semibold text-gray-800 dark:text-white truncate">{image.caption}</p>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">{image.district}</p>
+                            </div>
+                            <div className="flex gap-2 mt-4">
+                                <button onClick={() => setEditingImage(image)} className="flex-1 px-3 py-1.5 text-sm bg-gray-200 dark:bg-gray-600 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500">Edit</button>
+                                <button onClick={() => handleDelete(image)} className="px-3 py-1.5 text-sm bg-red-500 text-white rounded-md hover:bg-red-600">Delete</button>
                             </div>
                         </div>
-                        <button
-                            onClick={(e) => { e.stopPropagation(); handleDelete(image); }}
-                            className="absolute top-2 right-2 z-10 p-2 bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                            title="Delete image"
-                            aria-label="Delete image"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-                        </button>
                     </div>
                 ))}
             </div>
@@ -177,6 +255,12 @@ const GalleryView: React.FC = () => {
                 onClose={() => setIsUploadModalOpen(false)}
                 onUpload={handleUpload}
                 addNotification={addNotification}
+            />
+            
+            <EditModal
+                image={editingImage}
+                onClose={() => setEditingImage(null)}
+                onSave={handleSaveEdit}
             />
         </div>
     );

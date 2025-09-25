@@ -1,7 +1,9 @@
+
 import React, { createContext, useState, useEffect, useCallback } from 'react';
 import { Member, Candidate, SiteSettings, PageContent, GalleryImage, Announcement, AdminLog } from '../types';
 import * as api from '../utils/api';
 import { INITIAL_SETTINGS, INITIAL_CONTENT, INITIAL_MEMBERS, INITIAL_CANDIDATES, INITIAL_GALLERY, INITIAL_ANNOUNCEMENTS } from '../constants';
+import { supabase } from '../utils/supabase';
 
 interface SiteContextType {
     loading: boolean;
@@ -25,7 +27,8 @@ interface SiteContextType {
     clearAllMembers: () => Promise<void>;
     regenerateMemberCredentials: (id: string) => Promise<Member | null>;
     bulkRegenerateMemberCredentials: () => Promise<Member[]>;
-    addGalleryImages: (images: { file: File; caption: string }[]) => Promise<void>;
+    addGalleryImages: (images: { file: File; caption: string; district: string }[]) => Promise<void>;
+    updateGalleryImage: (image: GalleryImage) => Promise<void>;
     deleteGalleryImage: (image: GalleryImage) => Promise<void>;
 }
 
@@ -62,6 +65,26 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
     useEffect(() => {
         fetchData();
     }, [fetchData]);
+
+    useEffect(() => {
+        const channel = supabase
+            .channel('candidates-db-changes')
+            .on(
+                'postgres_changes',
+                { event: 'UPDATE', schema: 'public', table: 'candidates' },
+                (payload) => {
+                    const updatedCandidate = payload.new as Candidate;
+                    setCandidates(prev => 
+                        prev.map(c => c.id === updatedCandidate.id ? updatedCandidate : c)
+                    );
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    }, []);
 
     const updateMember = async (member: Member) => {
         const updatedMember = await api.updateMember(member);
@@ -136,10 +159,15 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return updatedMembers;
     };
 
-    const addGalleryImages = async (images: { file: File; caption: string }[]) => {
-        const uploadPromises = images.map(img => api.addGalleryImage(img.file, img.caption));
+    const addGalleryImages = async (images: { file: File; caption: string; district: string }[]) => {
+        const uploadPromises = images.map(img => api.addGalleryImage(img.file, img.caption, img.district));
         const newImages = await Promise.all(uploadPromises);
         setGallery(prev => [...prev, ...newImages]);
+    };
+
+    const updateGalleryImage = async (image: GalleryImage) => {
+        const updatedImage = await api.updateGalleryImage(image);
+        setGallery(prev => prev.map(g => (g.id === updatedImage.id ? updatedImage : g)));
     };
 
     const deleteGalleryImage = async (image: GalleryImage) => {
@@ -170,6 +198,7 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
         regenerateMemberCredentials,
         bulkRegenerateMemberCredentials,
         addGalleryImages,
+        updateGalleryImage,
         deleteGalleryImage,
     };
 

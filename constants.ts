@@ -1,3 +1,4 @@
+
 import { PageContent, SiteSettings, Member, Candidate, GalleryImage, Announcement } from './types';
 
 export const INITIAL_CONTENT: PageContent = {
@@ -52,6 +53,7 @@ export const INITIAL_CONTENT: PageContent = {
         title: 'Gallery',
         subtitle: 'A glimpse into our events, workshops, and community.',
         contentHtml: '',
+        bannerUrl: 'https://picsum.photos/seed/dma-banner/820/312',
     },
     contact: {
         title: 'Get In Touch',
@@ -62,7 +64,8 @@ export const INITIAL_CONTENT: PageContent = {
 
 export const INITIAL_SETTINGS: SiteSettings = {
     siteName: 'Digital Media Association',
-    logoUrl: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZhtPSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWRpY2UiPjxwYXRoIGQ9Ik00IDdoNWwxMS41IDExLjVMMjAgMTdsLTcuNS03LjVaIi8+PHBhdGggZD0iTTE4IDZjLTEuNjYgMC0zIDEuMzQtMyAzIi8+PC9zdmc+',
+    logoUrl: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZhtPSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWRpYicePjxwYXRoIGQ9Ik00IDdoNWwxMS41IDExLjVMMjAgMTdsLTcuNS03LjVaIi8+PHBhdGggZD0iTTE4IDZjLTEuNjYgMC0zIDEuMzQtMyAzIi8+PC9zdmc+',
+    faviconUrl: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZhtPSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWRpY2UiPjxwYXRoIGQ9Ik00IDdoNWwxMS41IDExLjVMMjAgMTdsLTcuNS03LjVaIi8+PHBhdGggZD0iTTE4IDZjLTEuNjYgMC0zIDEuMzQtMyAzIi8+PC9zdmc+',
     contact: {
         address: '123 Digital Avenue, Tech City, 10101',
         phone: '(555) 123-4567',
@@ -86,6 +89,13 @@ export const INITIAL_SETTINGS: SiteSettings = {
     font: {
         family: 'Inter',
     },
+    districts: [
+        'Alipurduar', 'Bankura', 'Birbhum', 'Cooch Behar', 'Dakshin Dinajpur',
+        'Darjeeling', 'Hooghly', 'Howrah', 'Jalpaiguri', 'Jhargram', 'Kalimpong',
+        'Kolkata', 'Malda', 'Murshidabad', 'Nadia', 'North 24 Parganas',
+        'Paschim Bardhaman', 'Paschim Medinipur', 'Purba Bardhaman',
+        'Purba Medinipur', 'Purulia', 'South 24 Parganas', 'Uttar Dinajpur'
+    ],
 };
 
 export const INITIAL_MEMBERS: Member[] = [
@@ -102,10 +112,10 @@ export const INITIAL_CANDIDATES: Candidate[] = [
 ];
 
 export const INITIAL_GALLERY: GalleryImage[] = [
-    { id: 'gal1', url: 'https://picsum.photos/600/400?random=1', caption: '2023 Annual Conference Keynote' },
-    { id: 'gal2', url: 'https://picsum.photos/600/400?random=2', caption: 'Networking Event Mixer' },
-    { id: 'gal3', url: 'https://picsum.photos/600/400?random=3', caption: 'Digital Art Workshop' },
-    { id: 'gal4', url: 'https://picsum.photos/600/400?random=4', caption: 'VR Technology Showcase' },
+    { id: 'gal1', url: 'https://picsum.photos/600/400?random=1', caption: '2023 Annual Conference Keynote', district: 'Kolkata' },
+    { id: 'gal2', url: 'https://picsum.photos/600/400?random=2', caption: 'Networking Event Mixer', district: 'Howrah' },
+    { id: 'gal3', url: 'https://picsum.photos/600/400?random=3', caption: 'Digital Art Workshop', district: 'North 24 Parganas' },
+    { id: 'gal4', url: 'https://picsum.photos/600/400?random=4', caption: 'VR Technology Showcase', district: 'Kolkata' },
 ];
 
 export const INITIAL_ANNOUNCEMENTS: Announcement[] = [

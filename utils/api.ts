@@ -83,7 +83,7 @@ export const getSiteData = async (): Promise<{
     return {
         members: membersRes.data || [],
         candidates: candidatesRes.data || [],
-        settings: settingsRes.data?.data || INITIAL_SETTINGS,
+        settings: { ...INITIAL_SETTINGS, ...(settingsRes.data?.data || {}) },
         content: contentRes.data?.data || INITIAL_CONTENT,
         gallery: galleryRes.data || [],
         announcements: announcementsRes.data || [],
@@ -295,7 +295,7 @@ export const changePassword = async (userId: string, oldPass: string, newPass: s
     }
 };
 
-export const addGalleryImage = async (file: File, caption: string): Promise<GalleryImage> => {
+export const addGalleryImage = async (file: File, caption: string, district: string): Promise<GalleryImage> => {
     const filePath = `public/${Date.now()}-${file.name}`;
     
     const { error: uploadError } = await supabase.storage.from('Gallery').upload(filePath, file);
@@ -312,6 +312,7 @@ export const addGalleryImage = async (file: File, caption: string): Promise<Gall
         id: generateId('gal'),
         url: publicUrlData.publicUrl,
         caption: caption || 'No caption',
+        district: district,
     };
 
     const { data, error: insertError } = await supabase.from('gallery').insert(newImage).select().single();
@@ -321,6 +322,17 @@ export const addGalleryImage = async (file: File, caption: string): Promise<Gall
         throw new Error(`Database insert failed: ${insertError.message}`);
     }
 
+    return data;
+};
+
+export const updateGalleryImage = async (image: GalleryImage): Promise<GalleryImage> => {
+    const { data, error } = await supabase
+        .from('gallery')
+        .update({ caption: image.caption, district: image.district })
+        .eq('id', image.id)
+        .select()
+        .single();
+    if (error) throw new Error(error.message);
     return data;
 };
 
