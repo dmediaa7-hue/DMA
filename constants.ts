@@ -23,12 +23,12 @@ export const INITIAL_CONTENT: PageContent = {
         subtitle: 'We offer a wide range of programs and services designed to support our members at every stage of their careers.',
         contentHtml: '',
         features: [
-            { title: 'Workshops & Training', description: 'Hands-on workshops on the latest tools and technologies in digital media.', icon: 'workshop' },
-            { title: 'Networking Events', description: 'Connect with industry leaders, peers, and potential employers at our exclusive events.', icon: 'networking' },
-            { title: 'Career Center', description: 'Access to job boards, resume reviews, and career coaching services.', icon: 'career' },
-            { title: 'Certification Programs', description: 'Earn industry-recognized certifications to validate your skills and expertise.', icon: 'certification' },
-            { title: 'Annual Conference', description: 'Our flagship event featuring keynote speakers, panel discussions, and technology showcases.', icon: 'conference' },
-            { title: 'Mentorship Program', description: 'Pairing experienced professionals with emerging talent for guidance and support.', icon: 'mentorship' },
+            { title: 'Workshops & Training', description: 'Hands-on workshops on the latest tools and technologies in digital media.', icon: 'workshop', imageUrl: 'https://picsum.photos/seed/dma-ws/400/300' },
+            { title: 'Networking Events', description: 'Connect with industry leaders, peers, and potential employers at our exclusive events.', icon: 'networking', imageUrl: 'https://picsum.photos/seed/dma-net/400/300' },
+            { title: 'Career Center', description: 'Access to job boards, resume reviews, and career coaching services.', icon: 'career', imageUrl: 'https://picsum.photos/seed/dma-car/400/300' },
+            { title: 'Certification Programs', description: 'Earn industry-recognized certifications to validate your skills and expertise.', icon: 'certification', imageUrl: 'https://picsum.photos/seed/dma-cert/400/300' },
+            { title: 'Annual Conference', description: 'Our flagship event featuring keynote speakers, panel discussions, and technology showcases.', icon: 'conference', imageUrl: 'https://picsum.photos/seed/dma-conf/400/300' },
+            { title: 'Mentorship Program', description: 'Pairing experienced professionals with emerging talent for guidance and support.', icon: 'mentorship', imageUrl: 'https://picsum.photos/seed/dma-ment/400/300' },
         ]
     },
      membership: {

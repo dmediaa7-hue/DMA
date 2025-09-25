@@ -30,11 +30,22 @@ const ServicesPage: React.FC = () => {
                 <div className="container mx-auto px-4">
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {services.features?.map(feature => (
-                            <Card key={feature.title}>
-                                <div className="p-8">
-                                    <div className="flex items-center justify-center h-16 w-16 rounded-full bg-primary/10 text-primary mb-6">
-                                        {iconMap[feature.icon]}
+                           <Card key={feature.title} className="flex flex-col">
+                                {feature.imageUrl ? (
+                                    <div className="relative w-full aspect-[4/3] bg-gray-100 dark:bg-gray-800">
+                                        <img
+                                            src={feature.imageUrl}
+                                            alt={feature.title}
+                                            className="w-full h-full object-cover no-copy"
+                                        />
                                     </div>
+                                ) : null}
+                                <div className="p-8 flex-grow flex flex-col">
+                                    {!feature.imageUrl && (
+                                        <div className="flex items-center justify-center h-16 w-16 rounded-full bg-primary/10 text-primary mb-6">
+                                            {iconMap[feature.icon]}
+                                        </div>
+                                    )}
                                     <h3 className="text-xl font-semibold mb-3">{feature.title}</h3>
                                     <p className="text-gray-600 dark:text-gray-400">{feature.description}</p>
                                 </div>
