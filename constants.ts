@@ -1,4 +1,3 @@
-
 import { PageContent, SiteSettings, Member, Candidate, GalleryImage, Announcement } from './types';
 
 export const INITIAL_CONTENT: PageContent = {
@@ -76,7 +75,7 @@ export const INITIAL_SETTINGS: SiteSettings = {
         twitter: '#',
         linkedin: '#'
     },
-    membershipFee: 150,
+    membershipFee: 5000,
     maintenanceMode: false,
     colors: {
         primary: '#8B5CF6',

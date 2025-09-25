@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useSite } from '../hooks/useSite';
@@ -44,7 +43,7 @@ const MembershipPage: React.FC = () => {
                 <div className="mt-20">
                     <div className="max-w-4xl mx-auto bg-gradient-to-r from-primary to-purple-500 rounded-lg shadow-2xl p-12 text-white text-center">
                         <h2 className="text-3xl font-bold mb-4">Ready to Join?</h2>
-                        <p className="text-xl mb-6">Annual membership is just <span className="font-bold">${settings.membershipFee}</span>.</p>
+                        <p className="text-xl mb-6">Annual membership is just <span className="font-bold">₹{settings.membershipFee.toLocaleString('en-IN')}</span>.</p>
                         <Link to="/login" className="bg-white text-primary font-bold py-3 px-8 rounded-full hover:bg-gray-200 transition-all duration-300 transform hover:scale-105">
                             Sign Up or Login
                         </Link>

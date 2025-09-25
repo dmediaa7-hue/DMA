@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useSite } from '../../hooks/useSite';
 import { useNotification } from '../../hooks/useNotification';
@@ -198,6 +197,15 @@ const SettingsView: React.FC = () => {
                                 <input id="linkedin-url" type="url" placeholder="https://linkedin.com/in/..." value={localSettings.socialLinks?.linkedin || ''} onChange={e => handleSocialChange('linkedin', e.target.value)} className="w-full p-2 border rounded-md bg-gray-100 dark:bg-gray-700" />
                             </div>
                         </div>
+                    </div>
+                     <div>
+                        <label className="block font-medium">Annual Membership Fee (INR)</label>
+                        <input 
+                            type="number" 
+                            value={localSettings.membershipFee} 
+                            onChange={e => setLocalSettings({...localSettings, membershipFee: parseInt(e.target.value, 10) || 0})} 
+                            className="w-full p-2 border rounded-md bg-gray-100 dark:bg-gray-700 mt-1" 
+                        />
                     </div>
                      <div>
                         <label className="block font-medium">Maintenance Mode</label>
