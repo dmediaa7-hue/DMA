@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSite } from '../../hooks/useSite';
 import { useNotification } from '../../hooks/useNotification';
 import { GalleryImage } from '../../types';
@@ -177,11 +176,85 @@ const EditModal: React.FC<{ image: GalleryImage | null; onClose: () => void; onS
 
 
 const GalleryView: React.FC = () => {
-    const { gallery, addGalleryImages, updateGalleryImage, deleteGalleryImage, addAdminLog } = useSite();
+    const { gallery, content, setContent, addGalleryImages, updateGalleryImage, deleteGalleryImage, addAdminLog } = useSite();
     const { addNotification } = useNotification();
 
     const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
     const [editingImage, setEditingImage] = useState<GalleryImage | null>(null);
+
+    const [galleryPageContent, setGalleryPageContent] = useState(content.gallery);
+
+    useEffect(() => {
+        setGalleryPageContent(content.gallery);
+    }, [content.gallery]);
+
+    const debouncedSave = useCallback(async (newData: typeof content.gallery) => {
+        if (JSON.stringify(newData) === JSON.stringify(content.gallery)) {
+            return;
+        }
+        try {
+            await setContent({ ...content, gallery: newData });
+            addNotification('success', 'Autosaved', 'Gallery page header changes were saved.');
+            await addAdminLog('Updated gallery page header content.');
+        } catch (error) {
+            if (error instanceof DOMException && error.name === 'QuotaExceededError') {
+                addNotification('error', 'Save Failed', "Storage quota exceeded. Please use a smaller banner image.");
+            } else {
+                addNotification('error', 'Save Failed', (error as Error).message);
+            }
+        }
+    }, [content, setContent, addAdminLog, addNotification]);
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            debouncedSave(galleryPageContent);
+        }, 1500);
+
+        return () => clearTimeout(handler);
+    }, [galleryPageContent, debouncedSave]);
+
+
+    const handleContentChange = (field: 'title' | 'subtitle', value: string) => {
+        setGalleryPageContent(prev => ({ ...prev, [field]: value }));
+    };
+
+    const handleBannerUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        if (file.size > 5 * 1024 * 1024) { // 5MB limit
+            addNotification('error', 'Image Too Large', 'Please upload an image smaller than 5MB.');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const img = new Image();
+            img.src = event.target?.result as string;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const MAX_WIDTH = 1920;
+                let width = img.width;
+                let height = img.height;
+
+                if (width > MAX_WIDTH) {
+                    height *= MAX_WIDTH / width;
+                    width = MAX_WIDTH;
+                }
+                
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                if (!ctx) return;
+                ctx.drawImage(img, 0, 0, width, height);
+                
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+
+                setGalleryPageContent(prev => ({ ...prev, bannerUrl: dataUrl }));
+            };
+        };
+        reader.readAsDataURL(file);
+    };
     
     const handleDelete = async (image: GalleryImage) => {
         if (window.confirm(`Are you sure you want to delete the image "${image.caption}"? This is irreversible.`)) {
@@ -216,38 +289,79 @@ const GalleryView: React.FC = () => {
     };
 
     return (
-        <div className="animate-fade-in">
-            <div className="flex justify-between items-center mb-6">
-                <h1 className="text-3xl font-bold text-gray-800 dark:text-white">Manage Gallery</h1>
-                <button 
-                    onClick={() => setIsUploadModalOpen(true)}
-                    className="px-6 py-2 bg-primary text-white font-semibold rounded-lg shadow-md hover:bg-primary-dark transition-colors"
-                >
-                    Add Images
-                </button>
+        <div className="animate-fade-in space-y-8">
+            <h1 className="text-3xl font-bold text-gray-800 dark:text-white">Manage Gallery Page</h1>
+            
+             <div className="bg-white dark:bg-dark-card p-6 rounded-lg shadow-md space-y-4">
+                <h2 className="text-xl font-semibold text-gray-800 dark:text-white border-b dark:border-gray-600 pb-3 mb-4">Page Header</h2>
+                <div>
+                    <label className="block text-sm font-medium mb-1">Page Title</label>
+                    <input
+                        type="text"
+                        value={galleryPageContent.title}
+                        onChange={e => handleContentChange('title', e.target.value)}
+                        className="w-full p-2 border rounded-md bg-gray-100 dark:bg-gray-700"
+                    />
+                </div>
+                <div>
+                    <label className="block text-sm font-medium mb-1">Page Subtitle</label>
+                    <input
+                        type="text"
+                        value={galleryPageContent.subtitle || ''}
+                        onChange={e => handleContentChange('subtitle', e.target.value)}
+                        className="w-full p-2 border rounded-md bg-gray-100 dark:bg-gray-700"
+                    />
+                </div>
+                <div>
+                   <label className="block text-sm font-medium mb-1">Banner Image</label>
+                   <div className="flex items-center gap-4 mt-2">
+                        <img src={galleryPageContent.bannerUrl} alt="Banner Preview" className="w-48 h-24 object-cover rounded-md bg-gray-200" />
+                       <div>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handleBannerUpload}
+                                className="text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
+                            />
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Recommended size: 820x312px. Max 5MB.</p>
+                       </div>
+                   </div>
+               </div>
             </div>
+            
+            <div>
+                <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Manage Gallery Images</h2>
+                    <button 
+                        onClick={() => setIsUploadModalOpen(true)}
+                        className="px-6 py-2 bg-primary text-white font-semibold rounded-lg shadow-md hover:bg-primary-dark transition-colors"
+                    >
+                        Add Images
+                    </button>
+                </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {gallery.map((image) => (
-                     <div key={image.id} className="group rounded-lg shadow-lg bg-white dark:bg-dark-card flex flex-col">
-                        <div
-                            style={{ backgroundImage: `url(${image.url})` }}
-                            className="w-full h-56 bg-cover bg-center rounded-t-lg"
-                            role="img"
-                            aria-label={image.caption}
-                        />
-                        <div className="p-4 flex-grow flex flex-col justify-between">
-                            <div>
-                                <p className="font-semibold text-gray-800 dark:text-white truncate">{image.caption}</p>
-                                <p className="text-sm text-gray-500 dark:text-gray-400">{image.district}</p>
-                            </div>
-                            <div className="flex gap-2 mt-4">
-                                <button onClick={() => setEditingImage(image)} className="flex-1 px-3 py-1.5 text-sm bg-gray-200 dark:bg-gray-600 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500">Edit</button>
-                                <button onClick={() => handleDelete(image)} className="px-3 py-1.5 text-sm bg-red-500 text-white rounded-md hover:bg-red-600">Delete</button>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {gallery.map((image) => (
+                        <div key={image.id} className="group rounded-lg shadow-lg bg-white dark:bg-dark-card flex flex-col">
+                            <div
+                                style={{ backgroundImage: `url(${image.url})` }}
+                                className="w-full h-56 bg-cover bg-center rounded-t-lg"
+                                role="img"
+                                aria-label={image.caption}
+                            />
+                            <div className="p-4 flex-grow flex flex-col justify-between">
+                                <div>
+                                    <p className="font-semibold text-gray-800 dark:text-white truncate">{image.caption}</p>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">{image.district}</p>
+                                </div>
+                                <div className="flex gap-2 mt-4">
+                                    <button onClick={() => setEditingImage(image)} className="flex-1 px-3 py-1.5 text-sm bg-gray-200 dark:bg-gray-600 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500">Edit</button>
+                                    <button onClick={() => handleDelete(image)} className="px-3 py-1.5 text-sm bg-red-500 text-white rounded-md hover:bg-red-600">Delete</button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                ))}
+                    ))}
+                </div>
             </div>
             
             <UploadModal 
